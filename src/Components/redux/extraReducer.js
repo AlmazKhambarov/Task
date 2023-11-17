@@ -12,11 +12,19 @@ export const AddPosts  = createAsyncThunk("create/post", async(payload)=>{
 
 export const GetById  = createAsyncThunk("post/get", async(payload)=>{
     return axios({
-        method:"POST",
+        method:"GET",
         data:payload,
-        url:POST + payload,
+        url:POST + "/" + payload,
     }).then(res=>res.data)
 })
+export const GetUserById  = createAsyncThunk("get/user", async(payload)=>{
+    return axios({
+        method:"GET",
+        data:payload,
+        url:POST + "/" + payload,
+    }).then(res=>res.data)
+})
+
 
 export const GetAllPosts = createAsyncThunk("get/post", async(payload)=>{
     return axios({

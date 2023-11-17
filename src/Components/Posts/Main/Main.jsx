@@ -15,7 +15,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { GetAllPosts } from "../../redux/extraReducer";
 import EditPost from "../Edit/EditPost";
-import { searchvalue } from "../../redux/postsSlice/postsSlice";
+import { DeletePost, searchvalue } from "../../redux/postsSlice/postsSlice";
+import { Link } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert";
+import 'react-confirm-alert/src/react-confirm-alert.css';
 const Main = () => {
   const { PostsData, searchValue } = useSelector((state) => state.posts);
   const [editModal, setEditModal] = useState(false);
@@ -24,10 +27,30 @@ const Main = () => {
   useEffect(() => {
     dispatch(GetAllPosts());
   }, []);
-  const filteredResults = PostsData.filter((item) =>
-  item.title.toLowerCase().includes(searchValue.toLowerCase()) ||   item.body.toLowerCase().includes(searchValue.toLowerCase())
-);
-  console.log(filteredResults);
+  const filteredResults = PostsData.filter(
+    (item) =>
+      item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+      item.body.toLowerCase().includes(searchValue.toLowerCase())
+  );
+  const handleClickConfirm = (id) => {
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure to do this.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            dispatch(DeletePost(id));
+          },
+        },
+        {
+          label: "No",
+          onClick: () => alert("Click No"),
+        },
+      ],
+    });
+  };
+
   return (
     <>
       <Navbar />
@@ -42,12 +65,18 @@ const Main = () => {
                   icon={faPenToSquare}
                   onClick={() => setEditModal(!editModal)}
                 />
-                <FontAwesomeIcon icon={faTrash} />
-                <FontAwesomeIcon icon={faEye} />
+                <FontAwesomeIcon icon={faTrash} onClick={()=>handleClickConfirm(el.id)}/>
+                <Link to={`/post/${el.id}`}>
+                  <FontAwesomeIcon icon={faEye} />
+                </Link>
               </div>
             </div>
             {editModal == el.id ? (
-              <EditPost setEditModal={el.id} setEditModall={setEditModal} datas={el} />
+              <EditPost
+                setEditModal={el.id}
+                setEditModall={setEditModal}
+                datas={el}
+              />
             ) : null}
           </>
         ))}

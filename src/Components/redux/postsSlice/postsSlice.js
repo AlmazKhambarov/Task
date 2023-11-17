@@ -1,38 +1,40 @@
 /** @format */
 
 import { createSlice } from "@reduxjs/toolkit";
-import { CreatePost, GetAllPosts, GetById } from "../extraReducer";
+import { CreatePost, GetAllPosts, GetById, GetUserById } from "../extraReducer";
 
 const initialState = {
   loading: null,
   error: null,
-  createFolderLoading: false,
+  postData: null,
   PostsData: [],
-  filesData: [],
-  searchValue:""
+  searchValue: "",
+  userData: null,
 };
 
 const postsSlice = createSlice({
   name: "posst",
   initialState,
   reducers: {
-    AddPost:(state, action)=>{
-        state.PostsData.push(action.payload)
-        state.loading = false
+    AddPost: (state, action) => {
+      state.PostsData.push(action.payload);
+      state.loading = false;
     },
-    Update:(state, action)=>{
-        console.log(action.payload)
-        const existingData = state.PostsData.find(el => el.id == action.payload.id)
-        console.log(existingData)
-        existingData.body = action.payload.body;
-        existingData.title = action.payload.title
+    Update: (state, action) => {
+      console.log(action.payload);
+      const existingData = state.PostsData.find(
+        (el) => el.id == action.payload.id
+      );
+      console.log(existingData);
+      existingData.body = action.payload.body;
+      existingData.title = action.payload.title;
     },
-    deletePostReducer: (state, action) => {
-        // state.photosData = state.photosData.filter(el => el.id != action.payload)
+    DeletePost: (state, action) => {
+      state.PostsData = state.PostsData.filter((el) => el.id != action.payload);
     },
-    searchvalue:(state, action)=>{
-        state.searchValue = action.payload
-    }
+    searchvalue: (state, action) => {
+      state.searchValue = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -41,9 +43,20 @@ const postsSlice = createSlice({
       })
       .addCase(GetById.fulfilled, (state, action) => {
         state.loading = false;
-        state.PostsData = action.payload;
+        state.postData = action.payload;
       })
       .addCase(GetById.rejected, (state, action) => {
+        state.error = action.error.message;
+      });
+    builder
+      .addCase(GetUserById.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(GetUserById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userData = action.payload;
+      })
+      .addCase(GetUserById.rejected, (state, action) => {
         state.error = action.error.message;
       });
     builder
@@ -59,5 +72,5 @@ const postsSlice = createSlice({
       });
   },
 });
-export const {AddPost, Update, searchvalue} = postsSlice.actions;
+export const { AddPost, Update, searchvalue, DeletePost } = postsSlice.actions;
 export default postsSlice.reducer;
